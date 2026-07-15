@@ -1,5 +1,7 @@
 # Data handling
 pandas
+matplotlib
+seaborn
 openpyxl          # required for reading .xlsx files
 
 # Kaggle API (for extract.py)
