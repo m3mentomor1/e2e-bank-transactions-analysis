@@ -1,0 +1,17 @@
+# Data handling
+pandas
+openpyxl          # required for reading .xlsx files
+
+# Kaggle API (for extract.py)
+kaggle
+
+# Database (for load.py -> Supabase/Postgres)
+sqlalchemy
+psycopg2-binary
+
+# Environment variable management (for DB credentials, API keys)
+python-dotenv
+
+# Jupyter notebooks (for EDA and analysis)
+jupyter
+notebook
