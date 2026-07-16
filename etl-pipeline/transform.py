@@ -33,6 +33,13 @@ COUNTRY_CORRECTIONS = {
     "Prague": "Czech Republic",
 }
 
+# City → country backfill when city is present but country is missing
+CITY_COUNTRY_BACKFILL = {
+    "Nottingham": "UK",
+    "Bristol": "UK",
+    "Swansea": "UK",
+}
+
 
 def parse_transaction_date(series: pd.Series) -> pd.Series:
     """
@@ -106,15 +113,27 @@ def transform(df: pd.DataFrame) -> pd.DataFrame:
     df.loc[interest_mask, "transaction_type"] = "INT"
     df["transaction_type"] = df["transaction_type"].fillna("Unknown")
 
-    # Fill remaining categorical nulls
+    # Fill remaining categorical nulls (category / city first)
     df["category"] = df["category"].fillna("Unknown")
     df["location_city"] = df["location_city"].fillna("Unknown")
-    df["location_country"] = df["location_country"].fillna("Unknown")
 
     # Normalize casing on label columns so Swansea/swansea become one value.
     # Leave transaction_type / description alone (bank codes & free-text narratives).
     for col in ["category", "location_city", "location_country"]:
         df[col] = standardize_label_case(df[col])
+
+    # EDA: some Nottingham rows have a city but no country — those are UK.
+    for city, country in CITY_COUNTRY_BACKFILL.items():
+        missing_country = (
+            df["location_city"].eq(city)
+            & df["location_country"].isna()
+        )
+        filled = int(missing_country.sum())
+        if filled:
+            df.loc[missing_country, "location_country"] = country
+            print(f"Backfilled location_country={country} for {filled} {city} row(s)")
+
+    df["location_country"] = df["location_country"].fillna("Unknown")
 
     # Correct known bad country labels
     df["location_country"] = df["location_country"].replace(COUNTRY_CORRECTIONS)
