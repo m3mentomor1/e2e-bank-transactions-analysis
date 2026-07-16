@@ -10,6 +10,7 @@ kaggle
 # Database (for load.py -> Supabase/Postgres)
 sqlalchemy
 psycopg2-binary
+supabase
 
 # Environment variable management (for DB credentials, API keys)
 python-dotenv
